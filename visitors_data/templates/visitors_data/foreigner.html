@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body%}
+
+
+<h1>New Visitor</h1>
+
+<form action="{% url 'visitors_data:confirm' %}" method="GET">
+    <label for="name">Name</label>
+    <input id="name" type="text" name="name">
+    <label for="number">Phone Number</label>
+    <input id="number" type="int" name="number">
+    <input type="submit" value="Complete">
+</form>
+
+
+{% endblock %}

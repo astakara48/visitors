@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <h1>이름: {{ visitor.name }}</h1>
+    <h1>전화번호: {{ visitor.number }}</h1>
+
+    <a href="{% url 'visitors_data:qr' visitor.pk %}">확인</a>
+
+    
+
+
+
+{% endblock %}

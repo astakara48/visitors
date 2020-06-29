@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Welcome</h1>
+
+<a href="{% url 'visitors_data:citizen' %}">내국인</a>
+<a href="{% url 'visitors_data:foreigner' %}">Foreigner</a>
+
+
+
+{% endblock %}

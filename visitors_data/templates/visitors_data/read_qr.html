@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+  <script type="text/javascript" src="{% static 'instascan.min.js' %} "></script>
+  
+{% endblock %}
+
+{% block body %}
+
+<h1>QR코드 체크</h1>
+
+<video id="preview"></video>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", event => {
+  let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    Instascan.Camera.getCameras()
+      .then(cameras => {
+      scanner.camera = cameras[cameras.length - 1];
+      scanner.start();
+    })
+      .catch(e => console.error(e));
+
+  
+  scanner.addListener('scan', content => {
+    const requestForm = new FormData()
+    requestForm.append('content', content)
+
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+    axios.post('https://e2c1feaef95b.ngrok.io/visitors/create_qr/', requestForm)
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  });
+
+});
+  
+</script>
+
+
+{% endblock %}
