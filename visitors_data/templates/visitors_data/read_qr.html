@@ -4,11 +4,9 @@
 
 {% block css %}
   <script type="text/javascript" src="{% static 'instascan.min.js' %} "></script>
-  
 {% endblock %}
 
 {% block body %}
-
 <h1>QR코드 체크</h1>
 
 <video id="preview"></video>
@@ -31,7 +29,7 @@ document.addEventListener("DOMContentLoaded", event => {
 
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.post('https://e2c1feaef95b.ngrok.io/visitors/create_qr/', requestForm)
+    axios.post('https://6803dd5ace88.ngrok.io/visitors/create_qr/', requestForm)
       .then(res => {
         console.log(res)
       })
@@ -39,10 +37,7 @@ document.addEventListener("DOMContentLoaded", event => {
         console.error(err)
       })
   });
-
 });
   
 </script>
-
-
 {% endblock %}

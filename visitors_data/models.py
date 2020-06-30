@@ -10,7 +10,7 @@ class Visitor(models.Model):
     number2 = models.CharField(max_length=11)
     date = models.DateTimeField(auto_now_add=True)
     check = models.CharField(max_length=10, default='FALSE')
-    image = models.FileField()
+    image = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

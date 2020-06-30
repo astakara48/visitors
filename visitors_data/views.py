@@ -4,8 +4,8 @@ import qrcode
 from .forms import VisitorForm
 import cv2
 import re
+import base64
 from IPython import embed
-from django.http import JsonResponse
 
 # Create your views here.
 
@@ -130,12 +130,7 @@ def qr(request, pk):
 #     return render(request, 'visitors_data/read_qr.html', context)
 
 def read_qr(request):
-
-
-    context = {
-
-    }
-    return render(request, 'visitors_data/read_qr.html',context)
+    return render(request, 'visitors_data/read_qr.html')
 
 
 def create_qr(request):
@@ -156,7 +151,22 @@ def create_qr(request):
         print('재방문자')
         visitor.save()
 
+    return render(request, 'visitors_data/result.html')
+
+
+def make_crop_image(request):
+    return render(request, 'visitors_data/make_crop_image.html')
+
+
+def get_crop_image(request, visitor_pk):
+    crop_image = request.POST.get('image')
+    # embed()
+    # print(crop_image)
+
+    visitor = Visitor.objects.get(pk=visitor_pk)
+    visitor.image = crop_image
+    visitor.save()
     context = {
-        'context': context
+        'visitor': visitor,
     }
-    return render(request, 'visitors_data/result.html', context)
+    return render(request, 'visitors_data/get_crop_image.html')
