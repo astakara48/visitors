@@ -44,21 +44,11 @@
         btn.onclick = e => {
             takeASnap()
             // Promise 객체 반환
-            .then(sendCropImage)
+            .then(download)
             // .then(download);
             
         };
     });
-
-    function generate_PNG(blob){
-        let a = document.createElement('a'); 
-        a.href = URL.createObjectURL(blob);
-        
-        var tmp_image = new FormData();
-        form.append(a.href,)
-        a.click();
-
-    }
 
     function takeASnap() {
             const canvas = document.createElement('canvas'); // create a canvas
@@ -78,6 +68,23 @@
         a.href = URL.createObjectURL(blob);
         a.download = 'picture.png';
         document.body.appendChild(a);
+        const blobImageUrl = URL.createObjectURL(blob)
+        console.log(blobImageUrl)
+
+        const requestForm = new FormData()
+        requestForm.append('image', blobImageUrl)
+
+        axios.defaults.xsrfCookieName = 'csrftoken'
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+        // https://686f9b8a3f69.ngrok.io/
+        axios.post('https://686f9b8a3f69.ngrok.io/visitors/get_crop_image/', requestForm)
+        .then(res => {
+            console.log(res)
+            // window.location.replace("http://127.0.0.1:8000/visitors/get_crop_image/");
+        })
+        .catch(err => {
+            console.error(err)
+        })
         a.click();
     }
 
