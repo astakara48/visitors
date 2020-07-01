@@ -77,11 +77,12 @@
         axios.defaults.xsrfCookieName = 'csrftoken'
         axios.defaults.xsrfHeaderName = 'X-CSRFToken'
         // https://686f9b8a3f69.ngrok.io/
-        axios.post('https://686f9b8a3f69.ngrok.io/visitors/get_crop_image/', requestForm)
+        axios.post('https://96c97b6071a7.ngrok.io/visitors/get_crop_image/', requestForm)
         .then(res => {
             console.log(res)
             // window.location.replace("http://127.0.0.1:8000/visitors/get_crop_image/");
         })
+        
         .catch(err => {
             console.error(err)
         })
