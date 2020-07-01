@@ -12,7 +12,7 @@
 
 <button>take a snapshot</button>
 <video></video>
-<div style="position: relative; left:600px; top: -160px;">
+<div style="position: relative; left:560px; top: -195px;">
     <hr width =21% color="66FF33" align="left" size=5/>
 
 <div style="position: relative; left:0px; top: -430px;" >
@@ -21,7 +21,7 @@
 <div style="position: relative; left:0px; top: -13px;" >
     <hr width = 3 color="66FF33" align="left" size=422/>   
 
-<div style="position: relative; left:360px; top: -430px;" >
+<div style="position: relative; left:395px; top: -430px;" >
     <hr width = 3 color="66FF33" align="left" size=422/>  
 </div>
 <hr>
@@ -50,6 +50,16 @@
         };
     });
 
+    function generate_PNG(blob){
+        let a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob);
+        
+        var tmp_image = new FormData();
+        form.append(a.href,)
+        a.click();
+
+    }
+
     function takeASnap() {
             const canvas = document.createElement('canvas'); // create a canvas
             const ctx = canvas.getContext('2d'); // get its context
@@ -66,7 +76,7 @@
         // uses the <a download> to download a Blob
         let a = document.createElement('a'); 
         a.href = URL.createObjectURL(blob);
-        a.download = 'picture.jpg';
+        a.download = 'picture.png';
         document.body.appendChild(a);
         a.click();
     }
@@ -75,13 +85,13 @@
         const blobImageUrl = URL.createObjectURL(blob)
         console.log(blobImageUrl)
 
-
         const requestForm = new FormData()
         requestForm.append('image', blobImageUrl)
 
         axios.defaults.xsrfCookieName = 'csrftoken'
         axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-        axios.post('http://127.0.0.1:8000/visitors/get_crop_image/15/', requestForm)
+        // https://686f9b8a3f69.ngrok.io/
+        axios.post('https://686f9b8a3f69.ngrok.io/visitors/get_crop_image/', requestForm)
         .then(res => {
             console.log(res)
             // window.location.replace("http://127.0.0.1:8000/visitors/get_crop_image/");

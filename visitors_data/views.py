@@ -65,8 +65,8 @@ def confirm(request, pk):
         'visitor': visitor,
 
     }
-    
-   
+
+
     return render(request, 'visitors_data/confirm.html', context)
 
 def qr(request, pk):
@@ -150,23 +150,44 @@ def create_qr(request):
     else:
         print('재방문자')
         visitor.save()
+    
+    # context = {
+    #     'visitor': visitor,
+    # }
 
-    return render(request, 'visitors_data/result.html')
+
+    return redirect('visitors_data:result')
+
+
+
+def result(request):
+    return render(request, 'visitors_data/make_crop_image.html')
 
 
 def make_crop_image(request):
     return render(request, 'visitors_data/make_crop_image.html')
 
 
-def get_crop_image(request, visitor_pk):
+def get_crop_image(request):
     crop_image = request.POST.get('image')
-    # embed()
-    # print(crop_image)
+    # # embed()
+    # # print(crop_image)
+    # fileName = '../tmp/test.png'
+    # req = requests.get(crop_image)
+    # file = open(fileName, 'wb')
+    # for chunk in req.iter_content(100000):
+    #     file.write(chunk)
+    # file.close()
+    return redirect('visitors_data:home')
 
-    visitor = Visitor.objects.get(pk=visitor_pk)
-    visitor.image = crop_image
-    visitor.save()
-    context = {
-        'visitor': visitor,
-    }
-    return render(request, 'visitors_data/get_crop_image.html')
+
+
+
+
+    # visitor = Visitor.objects.get(pk=visitor_pk)
+    # visitor.image = crop_image
+    # visitor.save()
+    # context = {
+    #     'visitor': visitor,
+    # }
+    # return render(request, 'visitors_data/get_crop_image.html')

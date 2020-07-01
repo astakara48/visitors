@@ -27,11 +27,12 @@ document.addEventListener("DOMContentLoaded", event => {
     const requestForm = new FormData()
     requestForm.append('content', content)
 
-    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfCookieName = 'csrftoken'   
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.post('https://6803dd5ace88.ngrok.io/visitors/create_qr/', requestForm)
+    axios.post('https://686f9b8a3f69.ngrok.io/visitors/create_qr/', requestForm)
       .then(res => {
         console.log(res)
+        window.location.replace("https://686f9b8a3f69.ngrok.io/visitors/make_crop_image/")
       })
       .catch(err => {
         console.error(err)
