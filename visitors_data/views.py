@@ -12,6 +12,13 @@ from PIL import Image
 import time
 # Create your views here.
 
+# ngrok 수정할 부분
+# settings.py
+# read_qr.html
+# make_crop_image.html
+
+recent_pk= 0
+
 def home(request):
     context = {
 
@@ -143,6 +150,9 @@ def create_qr(request):
     pk_number = int(p.findall(personal_info)[0][3:])
     
     visitor = Visitor.objects.get(pk=pk_number)
+    global recent_pk
+    recent_pk = pk_number
+    print("현재 접속한 사람의 PK:"+ str(recent_pk))
     visitor.check = "TRUE"
     
     if visitor.check == "FALSE":
@@ -173,7 +183,10 @@ def make_crop_image(request):
 
 def get_crop_image(request):
     crop_image = request.POST.get('image')
+    global recent_pk
+    print("PK 확인 : "+str(recent_pk))
     print(crop_image)
+    visitor = Visitor.objects.get(pk=recent_pk)
     # time.sleep(2)
     if len(crop_image)>=10:
         path = 'C:/Users/astak/Downloads/'
@@ -204,11 +217,14 @@ def get_crop_image(request):
         area = (190,113,440,370)
         im = im.crop(area)
         print(os.listdir('./'))
-        im.save('./static/images/'+file_name)
-        # im.save('')
-        # # 이미지 png로 저장
-        # im.save('../tmp/tmp.png')
-    
+        im = im.resize((224,224))
+        path = './static/images/'+str(recent_pk)+'.png'
+        im.save(path)
+        os.remove(most_recent_file)
+        print(path)
+        visitor.image = path
+
+
     
     # # embed()
     # # print(crop_image)
