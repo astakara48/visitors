@@ -8,8 +8,28 @@ import base64
 from IPython import embed
 import urllib.request as request
 import os
-from PIL import Image
+from PIL import Image 
+from keras.preprocessing import image
+import numpy as np
 import time
+import tensorflow as tf
+from keras.models import load_model
+
+global graph, model
+
+graph = tf.get_default_graph()
+
+model = load_model("./MaskCheckModel_Ver1.1.h5")
+
+class_dict = {
+    '마스크 미착용' : 0,
+    '마스크 착용' : 1,
+    '마스크 제대로 착용해' : 2
+}
+
+class_names = list(class_dict.keys())
+
+
 # Create your views here.
 
 # ngrok 수정할 부분
@@ -222,8 +242,22 @@ def get_crop_image(request):
         im.save(path)
         os.remove(most_recent_file)
         print(path)
-        visitor.image = path
 
+        img = image.load_img(path)
+        img = image.img_to_array(img)
+        img = img.reshape((1,) + img.shape)
+        img = img/255
+
+        with graph.as_default():
+            preds = model.predict(img)
+        preds = preds.flatten()
+        m = max(preds)
+        for index, item in enumerate(preds):
+            if item == m:
+                result = class_names[index]
+
+        print(result)
+        
 
     
     # # embed()
@@ -234,7 +268,7 @@ def get_crop_image(request):
     # for chunk in req.iter_content(100000):
     #     file.write(chunk)
     # file.close()
-    return redirect('visitors_data:home')
+    # return redirect('visitors_data:home')
 
 
 

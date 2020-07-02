@@ -16,7 +16,7 @@ from decouple import config
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ALLOWED_HOSTS = ['0998b2bc42ce.ngrok.io', '127.0.0.1']
+ALLOWED_HOSTS = ['d5442209624b.ngrok.io', '127.0.0.1']
 
 SECRET_KEY = config('SECRET_KEY')
 
