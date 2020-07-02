@@ -214,7 +214,7 @@ def get_crop_image(request):
                 tmp.append(cnt)
         file_name = most_recent_file[tmp[-1]:]
         print(file_name)
-        area = (190,113,440,370)
+        area = (220,113,470,380)
         im = im.crop(area)
         print(os.listdir('./'))
         im = im.resize((224,224))
