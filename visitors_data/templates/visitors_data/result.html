@@ -2,4 +2,117 @@
 
 {% block body %}
 <h1>QR Code 인식 완료</h1>
+<h2>{{ visitor.pk }}번, {{ visitor.name }}님 환영합니다.</h2>
+<p>고객님이 입력하신 핸드폰 번호는 <strong>{{ visitor.number }}</strong>입니다.</p>
+<hr>
+<div style="position: relative;"></div>
+
+<button id="snapshot">take a snapshot</button>
+<video></video>
+<div style="position: relative; left:370px; top: -400px;">
+    <table border="5" bordercolor='66FF33'>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</br>
+            &nbsp;</br>
+            &nbsp;</br>
+            &nbsp;</br>
+            &nbsp;</br>
+            &nbsp;</br>
+            &nbsp;</br>   
+            &nbsp;</br>
+            &nbsp;</br>
+            &nbsp;</br>
+        </td>
+
+    </table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    $(document).ready(function(){
+        const vid = document.querySelector('video');
+        navigator.mediaDevices.getUserMedia({video: true}) // request cam
+        .then(stream => {
+            vid.srcObject = stream; // don't use createObjectURL(MediaStream)
+            vid.width=720;
+            vid.height=480;
+        return vid.play(); // returns a Promise
+    })
+    .then(() => { // enable the button
+        const btn = document.getElementById('snapshot');
+        btn.disabled = false;
+        btn.onclick = e => {
+            const snap = takeASnap()
+            // Promise 객체 반환
+            // .then(download);
+            sendImage(snap)
+            
+        };
+    });
+
+    function takeASnap() {
+            const canvas = document.createElement('canvas'); // create a canvas
+            const ctx = canvas.getContext('2d'); // get its context
+            canvas.width = vid.videoWidth; // set its size to the one of the video
+            canvas.height = vid.videoHeight;
+            // ctx.scale(-1, 1);
+            ctx.drawImage(vid, 0, 0); // the video
+            // return new Promise((res, rej)=>{
+            //     canvas.toBlob(res, 'image/jpeg'); // request a Blob from the canvas
+            // });
+            return canvas.toDataURL();
+    }
+    
+    function download(blob) {
+        // uses the <a download> to download a Blob
+        let a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob);
+        a.download = 'picture.png';
+        document.body.appendChild(a);
+        const blobImageUrl = URL.createObjectURL(blob)
+        console.log(blobImageUrl)
+
+        const requestForm = new FormData()
+        requestForm.append('image', blobImageUrl)
+
+        axios.defaults.xsrfCookieName = 'csrftoken'
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+        
+        axios.post('https://2c417c25e0d4.ngrok.io/visitors/get_crop_image/', requestForm)
+        .then(res => {
+            console.log(res)
+            // window.location.replace("http://127.0.0.1:8000/visitors/get_crop_image/");
+        })
+        .catch(err => {
+            console.error(err)
+        })
+        a.click();
+    }
+
+    function sendImage(dataUrl) {
+        // const blobImageUrl = URL.createObjectURL(blob)
+        // console.log(blobImageUrl)
+
+        const requestForm = new FormData()
+        requestForm.append('image', dataUrl)
+
+        axios.defaults.xsrfCookieName = 'csrftoken'
+        axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+ 
+        axios.post('http://127.0.0.1:8000/visitors/get_crop_image/{{ visitor.pk }}/', requestForm)
+            .then(res => {
+                if (res.data.mask === 1) {
+                    window.location.replace("http://127.0.0.1:8000/visitors/home/");
+                } else {
+                    alert(res.data.message)
+                }
+            })
+            .catch(err => {
+                console.error(err)
+            })
+    }
+})
+</script>
 {% endblock %}

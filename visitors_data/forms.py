@@ -7,17 +7,11 @@ class VisitorForm(forms.ModelForm):
         model = Visitor
         fields = ('name', 'number', 'number2',)
         widgets = {'name': forms.TextInput(
-                        attrs={
-                            'placeholder': '홍길동',
-                    }),
+                        attrs={'class': 'form-control', 'placeholder': '홍길동', }),
                     'number': forms.NumberInput(
-                        attrs={
-                            'placeholder': '01012345678',
-                        }),
+                        attrs={'class': 'form-control', 'placeholder': '01012345678',}),
                     'number2': forms.NumberInput(
-                        attrs={
-                            'placeholder': '01012345678',
-                        }),
+                        attrs={'class': 'form-control', 'placeholder': '01012345678',}),
         }
         labels = {
             'name': '이름',

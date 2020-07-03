@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block css %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Noto+Sans+KR:wght@300;400;500&family=Source+Serif+Pro:wght@600&display=swap');
+ 
+h3 {
+  font-family: 'Noto Sans KR', sans-serif;
+  }
+
+div {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.form-control{border-width: 2px; border-color: grey;
+} 
+
+
+.form-control:focus {
+      box-shadow: papayawhip;
+      border-color: papayawhip;
+    }
+
+.form-control:focus {
+  border-color: #c8c1c1;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 253, 238, 0.712);
+}
+
+.form-control:valid{
+  background-color: papayawhip;
+}
+
+
+
+</style>
+{% endblock %}
+
+{% block body%}
+  <h3 class="text-center mt-5">신규 방문자 등록</h3>
+  <div class="container">
+    <form method="POST" class="border border-light p-5" style="width: 21rem; height: 11rem; margin:0 auto;" autocomplete="off">
+      {% csrf_token %}
+
+      {% for field in form %}
+      <div class="form-group">
+        <label class="control-label"  for="id_{{ field.name }}">{{ field.label }}</label>
+        {{ field }}
+        <p>{{ field.errors }}</p>
+      </div>
+      {% endfor %}
+      {{ form.non_field_errors }}
+      <input class="btn btn-block btn-dark mt-4"  type="submit" value="완료"></div>
+    </form>
+{% endblock%}
+
+

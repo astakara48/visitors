@@ -2,11 +2,25 @@
 
 {% load static %}
 
+{% block css %}
+  
+{% endblock %}
+
+
 {% block body %}
 
-<h1>QR코드 생성 완료</h1>
+<div class="p-3 mb-2 bg-dark text-white">
+    <div class="jumbotron bg-dark height:">
 
-<img src="{% static 'images/qrcode.png' %}" alt="qrcode">
+    <p class="text-center">QR코드 생성 완료</p>
+    <p class="text-center">추후 재사용을 원하시면 QR코드를 저장해주시기 바랍니다. </p>
+
+
+    <img class="rounded mx-auto d-block" src="{% static 'qr/'|add:pk|add:'.png' %}" alt="qrcode">
+    <!-- <p class="text-center mt-4">QR코드를 카메라에 인식시켜 주시기 바랍니다.</p> -->
+
+</div>
+</div>
 
 
 {% endblock %}

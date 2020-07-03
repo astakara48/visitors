@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <h1>Name: {{ visitor.name }}</h1>
+    <h1>Contact Number: {{ visitor.number }}</h1>
+
+    <a href="{% url 'visitors_data:qr' visitor.pk %}">Next</a>
+
+    
+
+
+
+{% endblock %}

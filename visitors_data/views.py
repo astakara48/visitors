@@ -4,16 +4,31 @@ import qrcode
 from .forms import VisitorForm
 import cv2
 import re
-import base64
-from IPython import embed
-import urllib.request as request
+from django.http import JsonResponse
 import os
-from PIL import Image 
+from django.conf import settings
+
+# from IPython import embed
+from django.core.files import File
+from django.http import JsonResponse
+from PIL import Image
+from io import BytesIO
+import base64
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.base import ContentFile
+
+# model import
+import tensorflow as tf
+import keras
 from keras.preprocessing import image
 import numpy as np
 import time
-import tensorflow as tf
 from keras.models import load_model
+
+# voice import
+from gtts import gTTS
+from io import BytesIO
+from playsound import playsound
 
 global graph, model
 
@@ -21,43 +36,13 @@ graph = tf.get_default_graph()
 
 model = load_model("./MaskCheckModel_Ver1.1.h5")
 
-class_dict = {
-    '마스크 미착용' : 0,
-    '마스크 착용' : 1,
-    '마스크 제대로 착용해' : 2
-}
-
-class_names = list(class_dict.keys())
-
-
-# Create your views here.
-
-# ngrok 수정할 부분
-# settings.py
-# read_qr.html
-# make_crop_image.html
-
-recent_pk= 0
-
 def home(request):
     context = {
 
     }
     return render(request, 'visitors_data/home.html', context)
 
-# def create(request):
-#     if request.method == 'POST':
-#         form = ArticleForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#     else:
-#         form = ArticleForm()
-#     context = {
-#         'form': form,
-#     }
-#     return render(request, 'articles/form.html', context)
-
-def citizen(request): # POST
+def new(request): # POST
     if request.method == 'POST':
         form = VisitorForm(request.POST)
         if form.is_valid():
@@ -69,11 +54,11 @@ def citizen(request): # POST
     context = {
         'form': form,
     }
-    return render(request, 'visitors_data/citizen.html', context)
+    return render(request, 'visitors_data/new.html', context)
 
 ## https://docs.djangoproject.com/en/3.0/ref/contrib/messages/    => error message custom
 
-def foreigner(request): # POST
+def new_en(request): # POST
     # if request.method == 'POST':
     #     name = request.POST.get('name')
     #     number = request.POST.get('number')
@@ -87,92 +72,44 @@ def foreigner(request): # POST
     context = {
 
     }
-    return render(request, 'visitors_data/foreigner.html', context)
+    return render(request, 'visitors_data/new_en.html', context)
 
 def confirm(request, pk):
     visitor = Visitor.objects.get(pk=pk)
     context = {
         'visitor': visitor,
-
     }
-
-
     return render(request, 'visitors_data/confirm.html', context)
 
 def qr(request, pk):
     visitor = Visitor.objects.get(pk=pk)
-    qr = qrcode.QRCode(version=2, error_correction=qrcode.constants.ERROR_CORRECT_H)
+    qr = qrcode.QRCode(version=2, box_size=5, error_correction=qrcode.constants.ERROR_CORRECT_H)
     info = visitor.name + '/' + visitor.number + '/' + 'PK:' + str(visitor.pk)
     qr.add_data(info)
     qr.make
     img = qr.make_image(fill_color='black', back_color='white')
-    img.save('./static/images/qrcode.png', format='PNG')
+    img.save(f'./static/qr/{pk}.png', format='PNG')
 
-    return render(request, 'visitors_data/qr.html')
-
-# def read_qr(request):
-
-#     # img = cv2.imread('./static/images/qrcode.png')
-#     # detector = cv2.QRCodeDetector()
-#     # data, bbox, straight_qrcode = detector.detectAndDecode(img)
-    
-#     # video
-
-#     # initalize the cam
-
-#     cap = cv2.VideoCapture(0)
-#     # initialize the cv2 QRCode detector
-#     detector = cv2.QRCodeDetector()
-#     while True:
-#         _, img = cap.read()
-#         # detect and decode
-#         data, bbox, _ = detector.detectAndDecode(img)
-#         # check if there is a QRCode in the image
-#         if bbox is not None:~
-#             # display the image with lines
-#             for i in range(len(bbox)):
-#                 # draw all lines
-#                 cv2.line(img, tuple(bbox[i][0]), tuple(bbox[(i+1) % len(bbox)][0]), color=(255, 0, 0), thickness=2)
-#             if data:
-#                 print("[+] QR Code detected, data:", data)
-#                 cap.release()
-#                 cv2.destroyAllWindows()
-#         # display the result
-#         cv2.imshow("img", img)    
-#         if cv2.waitKey(1) == ord("q"):
-#             break
-
-#     # PK 추출
-#     p = re.compile("P+K+[:]+[0-9]+")
-#     pk_number = p.findall(data)[0]
-
-#     p1 = re.compile("[0-9]+")
-#     current_pk = p1.findall(pk_number)[0]
-
-#     # DB 수정 (check='TRUE')
-#     visitor = Visitor.objects.get(pk=current_pk)
-#     visitor.check = "TRUE"
-#     visitor.save()
-
-#     context = {
-
-#     }
-#     return render(request, 'visitors_data/read_qr.html', context)
+    context = {
+        'pk': str(pk),
+    }
+    return render(request, 'visitors_data/qr.html', context)
 
 def read_qr(request):
     return render(request, 'visitors_data/read_qr.html')
-
 
 def create_qr(request):
     personal_info = request.POST.get('content')
 
     p = re.compile("P+K+[:]+[0-9]+")
-    pk_number = int(p.findall(personal_info)[0][3:])
     
-    visitor = Visitor.objects.get(pk=pk_number)
+    pk_number = int(p.findall(personal_info)[0][3:])
+    print(pk_number)
+    
     global recent_pk
     recent_pk = pk_number
-    print("현재 접속한 사람의 PK:"+ str(recent_pk))
+    visitor = Visitor.objects.get(pk=recent_pk)
+    # print("recent_pk 확인 : " + str(recent_pk))
     visitor.check = "TRUE"
     
     if visitor.check == "FALSE":
@@ -183,82 +120,75 @@ def create_qr(request):
     else:
         print('재방문자')
         visitor.save()
-    
+
     # context = {
-    #     'visitor': visitor,
+    #     'context': context
     # }
+    # return redner(request, 'articles/index.html', context)
+    return redirect('visitors_data:result', visitor.pk)
 
 
-    return redirect('visitors_data:result')
+def result(request, visitor_pk):
+    visitor = Visitor.objects.get(pk=visitor_pk)
+    context = {
+        'visitor': visitor,
+    }
+    return render(request, 'visitors_data/result.html', context)
 
 
+# def make_crop_image(request):
+#     return render(request, 'visitors_data/make_crop_image.html')
 
-def result(request):
-    return render(request, 'visitors_data/make_crop_image.html')
+# def get_crop_image(request):
+#     crop_image = request.POST.get('image')
+#     global recent_pk
+#     print("PK 확인 : "+str(recent_pk))
 
+#     # print(crop_image)
+#     # time.sleep(2)
+#     if len(crop_image) >= 10:
+#         path = 'C:/Users/student/Downloads/'
 
-def make_crop_image(request):
-    return render(request, 'visitors_data/make_crop_image.html')
+#         # each_file_path_and_gen_time: 각 file의 경로와, 생성 시간을 저장함
+#         each_file_path_and_gen_time = []
+#         for each_file_name in os.listdir(path):
+#             # getctime: 입력받은 경로에 대한 생성 시간을 리턴
+#             each_file_path = path + each_file_name
+#             each_file_gen_time = os.path.getctime(each_file_path)
+#             each_file_path_and_gen_time.append(
+#                 (each_file_path, each_file_gen_time)
+#             )
 
+#         # 가장 생성시각이 큰(가장 최근인) 파일을 리턴 
+#         most_recent_file = max(each_file_path_and_gen_time, key=lambda x: x[1])[0][2:]
+#         # 이미지 열기
+#         print("가장 최근에 생성된 파일 : "+most_recent_file)
+#         im = Image.open(most_recent_file)
+#         cnt = 0
+#         tmp = []
+#         for i in most_recent_file:
+#             cnt+=1
+#             if i in '/':
+#                 tmp.append(cnt)
+#         file_name = most_recent_file[tmp[-1]:]
+#         print(file_name)
+#         area = (190,113,440,370)
+#         im = im.crop(area)
+#         im = im.resize((224,224))
+#         path = './static/images/'+str(recent_pk)+'.png'
+#         im.save(path)
 
-def get_crop_image(request):
-    crop_image = request.POST.get('image')
-    global recent_pk
-    print("PK 확인 : "+str(recent_pk))
-    print(crop_image)
-    visitor = Visitor.objects.get(pk=recent_pk)
-    # time.sleep(2)
-    if len(crop_image)>=10:
-        path = 'C:/Users/astak/Downloads/'
+#         # DB에 이미지 저장
+#         visitor = Visitor.objects.get(pk=recent_pk)
+#         visitor.image = path
+#         visitor.save()
 
-        # each_file_path_and_gen_time: 각 file의 경로와, 생성 시간을 저장함
-        each_file_path_and_gen_time = []
-        for each_file_name in os.listdir(path):
-            # getctime: 입력받은 경로에 대한 생성 시간을 리턴
-            each_file_path = path + each_file_name
-            each_file_gen_time = os.path.getctime(each_file_path)
-            each_file_path_and_gen_time.append(
-                (each_file_path, each_file_gen_time)
-            )
+#         os.remove(most_recent_file)
 
-        # 가장 생성시각이 큰(가장 최근인) 파일을 리턴 
-        most_recent_file = max(each_file_path_and_gen_time, key=lambda x: x[1])[0][2:]
-        # 이미지 열기
-        print("가장 최근에 생성된 파일 : "+most_recent_file)
-        im = Image.open(most_recent_file)
-        cnt = 0
-        tmp = []
-        for i in most_recent_file:
-            cnt+=1
-            if i in '/':
-                tmp.append(cnt)
-        file_name = most_recent_file[tmp[-1]:]
-        print(file_name)
-        area = (220,113,470,380)
-        im = im.crop(area)
-        print(os.listdir('./'))
-        im = im.resize((224,224))
-        path = './static/images/'+str(recent_pk)+'.png'
-        im.save(path)
-        os.remove(most_recent_file)
-        print(path)
-
-        img = image.load_img(path)
-        img = image.img_to_array(img)
-        img = img.reshape((1,) + img.shape)
-        img = img/255
-
-        with graph.as_default():
-            preds = model.predict(img)
-        preds = preds.flatten()
-        m = max(preds)
-        for index, item in enumerate(preds):
-            if item == m:
-                result = class_names[index]
-
-        print(result)
-        
-
+         # im.save('')
+        # # 이미지 png로 저장
+        # im.save('../tmp/tmp.png')
+    
     
     # # embed()
     # # print(crop_image)
@@ -268,16 +198,91 @@ def get_crop_image(request):
     # for chunk in req.iter_content(100000):
     #     file.write(chunk)
     # file.close()
-    # return redirect('visitors_data:home')
+    return redirect('visitors_data:home')
+
+
+
+
+def get_crop_image_2(request, pk):
+    crop_image = request.POST.get('image')
+
+    im = Image.open(BytesIO(base64.b64decode(crop_image.split(',')[1])))
+
+    # file_name = f'{pk}.png'
+
+    # path = f'{settings.MEDIA_ROOT}/face/'+file_name
+    
+    file_name = str(pk)+'.png'
+
+    path = './media/face/'+file_name
+
+    print("file_name : " + file_name)
+    
+    area = (190,113,440,370)
+    im = im.crop(area)
+    im = im.resize((224,224))
+
+    im.save(path)
+
+    img = image.load_img(path)
+    img = image.img_to_array(img)
+    img = img.reshape((1,) + img.shape)
+    img = img/255
+
+    with graph.as_default():
+        # model = load_model("./MaskCheckModel_Ver1.1.h5")
+        preds = model.predict(img)
+
+    m = np.argmax(preds)
+
+    # print(model.summary())
+
+    print("판독결과 : ", m)
+
+    if m==1:
+        playsound('./on_mask.mp3')
+
+    else:
+        playsound('./off_mask.mp3')
+
+    buffer = BytesIO()
+    im.save(fp=buffer, format='PNG')
+    image_file = ContentFile(buffer.getvalue())
+
+    # DB에 이미지 저장
+    visitor = Visitor.objects.get(pk=pk)
+    visitor.image.save(file_name, InMemoryUploadedFile(
+                                        image_file,          # file
+                                        None,                # field_name
+                                        file_name,           # file name
+                                        'image/png',         # content_type
+                                        im.tell,             # size
+                                        None,                # content_type_extra
+                                    ))                
+    visitor.save()
+
+    # 마스크 판독
+    
+    messages = {
+        0: '마스크 미착용. 마스크를 착용하지 않으셨습니다.',
+        1: '마스크 착용. 즐거운 시간 되십시오.',
+        2: '마스크 인식 불가. 마스크를 제대로 착용해주세요.',
+    }
+    
+    data = {
+        'mask': int(m),
+        'message': messages.get(int(m)),
+    }
+
+
+    return JsonResponse(data, safe=False)
 
 
 
 
 
-    # visitor = Visitor.objects.get(pk=visitor_pk)
-    # visitor.image = crop_image
-    # visitor.save()
-    # context = {
-    #     'visitor': visitor,
-    # }
-    # return render(request, 'visitors_data/get_crop_image.html')
+
+
+
+
+   

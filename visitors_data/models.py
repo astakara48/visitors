@@ -10,18 +10,16 @@ class Visitor(models.Model):
     number2 = models.CharField(max_length=11)
     date = models.DateTimeField(auto_now_add=True)
     check = models.CharField(max_length=10, default='FALSE')
-    image = models.CharField(max_length=500)
+    image = models.ImageField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-
-
-# def number_validator(self):
-#     number = self.number
-#     number2 = self.number2
-    
-#     if number != number2:
-#         msg = '전화번호를 다시 확인해주세요'
-#         raise ValidationError(msg)
+    def number_validator(self):
+        number = self.number
+        number2 = self.number2
+        
+        if number != number2:
+            msg = '전화번호를 다시 확인해주세요'
+            raise ValidationError(msg)
         
         

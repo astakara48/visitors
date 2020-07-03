@@ -3,13 +3,52 @@
 {% load static %}
 
 {% block css %}
+
+<style>
+h1 {
+  font-family: 'Nanum Gothic', sans-serif;
+}
+
+img {
+  position: absolute;
+  top: 100;
+  bottom: 0;
+  left: 100;
+  right: 10;
+  margin: auto;
+}
+
+
+/* h4 {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left:  50;
+  right: 10;
+  margin: auto;
+} */
+/* 
+h4 {
+  letter-spacing: -10px;
+} */
+
+</style>
+
+
   <script type="text/javascript" src="{% static 'instascan.min.js' %} "></script>
+  
 {% endblock %}
 
 {% block body %}
-<h1>QR코드 체크</h1>
 
-<video id="preview"></video>
+<h1 class="ml-5 mb-5">QR코드를 인식시켜 주시기 바랍니다</h1>
+<h4 class="">QR코드가 없으신 분은 여기로 접속하여</h4>
+<!-- <h4 class="">QR코드를 생성해 주시기 바랍니다</h4> -->
+
+<!-- <h4 class="ml-5"></h1> -->
+
+
+<video class="ml-5" id="preview"></video>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
@@ -17,22 +56,28 @@ document.addEventListener("DOMContentLoaded", event => {
   let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
     Instascan.Camera.getCameras()
       .then(cameras => {
-      scanner.camera = cameras[cameras.length - 1];
+        console.log(cameras)
+      scanner.camera = cameras[0];
       scanner.start();
     })
       .catch(e => console.error(e));
 
   
   scanner.addListener('scan', content => {
+    console.log(content)
+    // const pkNumber = content.slice(21, 23)
+    const pkNumber = content.split(':')[1]
+    // console.log(content.length)
     const requestForm = new FormData()
     requestForm.append('content', content)
 
-    axios.defaults.xsrfCookieName = 'csrftoken'   
+    axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-    axios.post('https://d5442209624b.ngrok.io/visitors/create_qr/', requestForm)
+
+    axios.post('http://127.0.0.1:8000/visitors/create_qr/', requestForm)
       .then(res => {
         console.log(res)
-        window.location.replace("https://d5442209624b.ngrok.io/visitors/make_crop_image/")
+        window.location.replace(`http://127.0.0.1:8000/visitors/result/${pkNumber}/`);
       })
       .catch(err => {
         console.error(err)
@@ -41,4 +86,8 @@ document.addEventListener("DOMContentLoaded", event => {
 });
   
 </script>
+
+
+<!-- <h3><img class="ml-5 justify align-items-center" src="{% static 'images/naver_qrcode.png' %}"> QR코드를 인식시켜 주시기 바랍니다</h3> -->
+
 {% endblock %}
