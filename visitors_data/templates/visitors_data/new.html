@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block css %}
-
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Noto+Sans+KR:wght@300;400;500&family=Source+Serif+Pro:wght@600&display=swap');
  
@@ -30,28 +29,47 @@ div {
 .form-control:valid{
   background-color: papayawhip;
 }
-
-
-
 </style>
 {% endblock %}
 
-{% block body%}
-  <h3 class="text-center mt-5">신규 방문자 등록</h3>
-  <div class="container">
-    <form method="POST" class="border border-light p-5" style="width: 21rem; height: 11rem; margin:0 auto;" autocomplete="off">
-      {% csrf_token %}
+{% block body %}
+<h3 class="text-center mt-5">신규 방문자 등록</h3>
+<div class="container">
+  <form method="POST" class="border border-light p-5" id="sendInfo" style="width: 21rem; height: 11rem; margin:0 auto;" autocomplete="off">
+    {% csrf_token %}
 
-      {% for field in form %}
-      <div class="form-group">
-        <label class="control-label"  for="id_{{ field.name }}">{{ field.label }}</label>
-        {{ field }}
-        <p>{{ field.errors }}</p>
-      </div>
-      {% endfor %}
-      {{ form.non_field_errors }}
-      <input class="btn btn-block btn-dark mt-4"  type="submit" value="완료"></div>
-    </form>
-{% endblock%}
+    {% for field in form %}
+    <div class="form-group">
+      <label class="control-label"  for="id_{{ field.name }}">{{ field.label }}</label>
+      {{ field }}
+      <p>{{ field.errors }}</p>
+    </div>
+    {% endfor %}
+    {{ form.non_field_errors }}
+    <p><small><input type="checkbox" id="agreement" value="agreement"> 감염병 예방 및 전파의 차단을 위한 개인정보 제공에 동의합니다</small></p>
+    <p><small>※ 방문자 명단을 허위로 작성하는 경우 최고 300만원의 벌금이 부과될 수 있습니다</small></p>
+    <!-- {{ form.non_field_errors }} -->
+    <input class="btn btn-block btn-dark mt-4"  type="submit" value="완료">
+  </form>
+</div>
+
+<script>
+  const sendInfo = document.getElementById('sendInfo')
+  console.log(sendInfo)
+  
+  const checkAgreement = function() {
+    const info = document.getElementById('agreement').checked
+    return info
+  }
+
+  sendInfo.addEventListener('submit', event => {
+    // console.log(event)
+    if (!checkAgreement()) {
+      alert('감염병 예방을 위한 동의 사항에 체크해주세요.')
+      event.preventDefault()
+    }
+  })
+</script>
+{% endblock %}
 
 

@@ -11,38 +11,24 @@ div {
 h1 {
     font-family: 'Source Serif Pro', serif;
 }
-
 </style>
 {% endblock %}
-
 
 {% block body %}
 <div class="mx-auto" style="max-width: 100%;">
 
-    <div class="p-3 mb-2 bg-dark text-white">
-    <div class="jumbotron bg-dark">
-        <!-- <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-        <hr class="my-4">
-        <p>It uses utility classes for typography and spacing to space content out within the larger container.</p> -->
-        <div class="mx-auto" style="width: 250px;">
-        <p class="text-white bg-dark">
-        <h1 class="display-5 header mb-1 text-center">Welcome</h1>
-        <p class="text-center">QR코드 신규 발급 페이지입니다.</p>
-        <div class="d-flex justify-content-center">
-            <a class="btn btn-outline-light mr-1" href="{% url 'visitors_data:new' %}" role="button">한국어</a>
-            <a class="btn btn-outline-light" href="{% url 'visitors_data:new_en' %}" role="button">English</a>
-        </div>
-      </div></p>
-      </div>
+<div class="p-3 mb-2 bg-dark text-white">
+<div class="jumbotron bg-dark">
+    <div class="mx-auto" style="width: 250px;">
+    <p class="text-white bg-dark">
+    <h1 class="display-5 header mb-1 text-center">Welcome</h1>
+    <p class="text-center">QR코드 신규 발급 페이지입니다.</p>
+    <div class="d-flex justify-content-center">
+        <a class="btn btn-outline-light mr-1" href="{% url 'visitors_data:new' %}" role="button">한국어</a>
+        <a class="btn btn-outline-light disabled" href="{% url 'visitors_data:new_en' %}" role="button">English</a>
     </div>
+    </div></p>
     </div>
-
-
-<!-- <h1>Welcome</h1>
-
-<a href="{% url 'visitors_data:new' %}">한국어</a>
-<a href="{% url 'visitors_data:new_en' %}">English</a> -->
-
-
-
+</div>
+</div>
 {% endblock %}

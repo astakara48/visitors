@@ -237,3 +237,6 @@ log/
 
 # OS
 Thumbs.db
+
+# Model
+MaskCheckModel_*

@@ -3,52 +3,46 @@
 {% load static %}
 
 {% block css %}
-
 <style>
+@font-face { font-family: 'GmarketSansBold'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff'); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Bazzi'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/Bazzi.woff') format('woff'); font-weight: normal; font-style: normal; }
+
 h1 {
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'GmarketSansBold';
 }
 
-img {
-  position: absolute;
-  top: 100;
-  bottom: 0;
-  left: 100;
-  right: 10;
-  margin: auto;
+.site-qr {
+  display: block;
 }
 
+.test {
+  font-family: 'Bazzi';
+}
 
-/* h4 {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left:  50;
-  right: 10;
-  margin: auto;
-} */
-/* 
-h4 {
-  letter-spacing: -10px;
-} */
-
+.test2 {
+  border-radius: 5%;
+  box-shadow: 11px 11px 42px 0px rgba(73,73,74,1);
+}
 </style>
-
-
-  <script type="text/javascript" src="{% static 'instascan.min.js' %} "></script>
-  
+<script type="text/javascript" src="{% static 'instascan.min.js' %} "></script>
 {% endblock %}
 
+
 {% block body %}
-
-<h1 class="ml-5 mb-5">QR코드를 인식시켜 주시기 바랍니다</h1>
-<h4 class="">QR코드가 없으신 분은 여기로 접속하여</h4>
-<!-- <h4 class="">QR코드를 생성해 주시기 바랍니다</h4> -->
-
-<!-- <h4 class="ml-5"></h1> -->
-
-
-<video class="ml-5" id="preview"></video>
+<div class="container">
+  <h1 class="mt-5 mb-5 text-center">QR코드 인식 후 마스크 착용 여부 확인</h1>
+  <div class="row body-border">
+      <video class="test2 mt-4" id="preview"></video>
+      <h3>
+        <div class="ml-5 text-center test">
+          <img class="site-qr" src="{% static 'qr/site.png' %}"><br>
+          <strong> QR코드가 없으신 분은 여기로 접속하여<br>
+          QR코드를 생성해 주시기 바랍니다</strong>
+        </div>
+      </h3>
+    </div>
+  <h4 class=""></h4>
+</div>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
@@ -57,37 +51,30 @@ document.addEventListener("DOMContentLoaded", event => {
     Instascan.Camera.getCameras()
       .then(cameras => {
         console.log(cameras)
-      scanner.camera = cameras[0];
-      scanner.start();
-    })
+        scanner.camera = cameras[0];
+        scanner.start();
+      })
       .catch(e => console.error(e));
 
   
   scanner.addListener('scan', content => {
-    console.log(content)
-    // const pkNumber = content.slice(21, 23)
     const pkNumber = content.split(':')[1]
-    // console.log(content.length)
     const requestForm = new FormData()
     requestForm.append('content', content)
 
     axios.defaults.xsrfCookieName = 'csrftoken'
     axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
-    axios.post('http://127.0.0.1:8000/visitors/create_qr/', requestForm)
+    axios.post('/visitors/create_qr/', requestForm)
       .then(res => {
         console.log(res)
-        window.location.replace(`http://127.0.0.1:8000/visitors/result/${pkNumber}/`);
+        window.location.replace(`/visitors/result/${pkNumber}/`);
       })
       .catch(err => {
         console.error(err)
       })
   });
 });
-  
 </script>
-
-
-<!-- <h3><img class="ml-5 justify align-items-center" src="{% static 'images/naver_qrcode.png' %}"> QR코드를 인식시켜 주시기 바랍니다</h3> -->
 
 {% endblock %}
