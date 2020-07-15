@@ -71,4 +71,37 @@
 ##### 1) Model 생성
 
 - MaskCheckModel_Ver*.ipynb 파일들은 모델만들고 테스트 했던 파일
-- 
+- 1.1에서는 mask 착용 여부만 확인, 1.2는 mask 착용 여부, 불량 착용, 사람이 없는 경우 4가지 class
+- 1.3 VGG19 test
+- 2.0 ResNet test
+- 실제 파일 만들어서 확인 결과 오히려 1.3, 2.0은 인식률이 더 떨어짐 그래서 1.2 버전으로 대체
+
+```python
+model.add(Conv2D(64, (3,3), activation='relu', input_shape=(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNEL)))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Dropout(0.25))
+```
+
+- Conv2D : 필터로 특징을 뽑아주는 layer
+- BatchNormalization 
+  - gradient vanishing 문제를 해결하는 아이디어 중 하나
+  - training 과정 자체에서 안정화하여 학습하면 학습 속도를 가속시킬 수 있다고 함
+  - 자체적으로 regularization 효과가 있다.
+
+- MaxPooling2d
+  - Conv2D의 출력 image에서 주요값만 추출하여 크기가 작은 image를 만든다. 
+  - 지역적인 사소한 변화가 영향을 미치지 않도록 해줌
+
+
+
+##### 2) view.py, result.html
+
+```python
+def get_crop_image_2(request, pk):
+```
+
+- result.html에서 하는 사진 촬영 및 마스크 판독여부를 실행하는 함수
+- 사진을 촬영하면 해당 부분만 crop하고 판독 model의 input이 (224,224) 이므로 resize한다.
+- 촬영 사진은 해당 pk.png 로 저장
+- https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/ 참고 자료
