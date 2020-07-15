@@ -14,7 +14,6 @@ h1 {
 
 h4 {
     font-family: 'InfinitySans-RegularA1';    
-    /* letter-spacing: 1px; */
     }
 
 
@@ -44,9 +43,14 @@ video{
     float:right;
         }
 
-video {
-    position:relative;
-    }
+.green-box {
+    width: 300px;
+    height: 300px;
+    border: 4px solid #66FF33;
+    position: absolute;
+    top: 116px;
+    left: calc(50vw-154px);
+}
 
 </style>
 {% endblock %}
@@ -54,38 +58,18 @@ video {
 {% block body %}
 <div class="test"></div>
 <h4 class="text-center mt-5 mb-5"><strong>{{ visitor.name }}</strong>님 환영합니다<br>마스크 착용 후, 초록색 네모칸 안에 얼굴을 맞추고 촬영 버튼을 눌러주세요</h4>
-<div class="d-flex justify-content-center">
+<div class="d-flex justify-content-center position-relative">
     <video></video>
+    <div class="green-box"></div>
 </div>
 <div id="message" class="text-center mt-3">&nbsp;</div>
 
 <div class="d-flex justify-content-center mt-3">
     <button type="button" class="btn btn-dark bt-background white" id="snapshot">사진 촬영</button>
 </div>
-<!-- <div style="position: static; left:670px; top: -520px;"> -->
-<!-- <div style="align-middle"> -->
 
-<div class="d-flex justify-content-center align-middle" id="green_box">
 
-    <table border="5" bordercolor='66FF33'>
-        <td>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-            &nbsp;</br>
-        </td>
-     </table>
-</div>
-<hr>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
