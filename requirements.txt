@@ -12,5 +12,5 @@ python-decouple==3.3
 pytz==2020.1
 qrcode==6.1
 six==1.15.0
-tensorflow==1.14.0
+tensorflow==2.5.1
 keras==2.2.4
