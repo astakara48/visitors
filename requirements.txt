@@ -5,7 +5,7 @@ labelImg==1.8.3
 lxml==4.5.1
 numpy==1.19.0
 opencv-python-headless==4.2.0.34
-Pillow==7.1.2
+Pillow==9.0.1
 PyQt5==5.15.0
 PyQt5-sip==12.8.0
 python-decouple==3.3
